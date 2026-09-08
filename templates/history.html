@@ -1,0 +1,80 @@
+{% extends "base.html" %}
+{% block title %}Lịch sử kiểm tra — Email Guard AI{% endblock %}
+{% block body %}
+<div class="app-shell">
+  {% include "_sidebar.html" %}
+
+  <main class="main">
+    <div class="page-head">
+      <div class="eyebrow">LỊCH SỬ</div>
+      <h1>Toàn bộ email bạn đã kiểm tra</h1>
+      <p>Nhấn vào một mục để xem lại nội dung email và lý do AI đưa ra cảnh báo tại thời điểm đó.</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-tile safe">
+        <div class="n">{{ stats.get('An toàn', 0) }}</div>
+        <div class="l">Email an toàn</div>
+      </div>
+      <div class="stat-tile warn">
+        <div class="n">{{ stats.get('Nghi ngờ', 0) }}</div>
+        <div class="l">Email nghi ngờ</div>
+      </div>
+      <div class="stat-tile danger">
+        <div class="n">{{ stats.get('Nguy hiểm', 0) }}</div>
+        <div class="l">Email nguy hiểm</div>
+      </div>
+    </div>
+
+    {% if history %}
+    <div class="history-list" id="history-list">
+      {% for item in history %}
+      <div class="history-item" data-id="{{ item['id'] }}"
+           data-sender="{{ item['sender'] or '' }}"
+           data-subject="{{ item['subject'] or '' }}"
+           data-content="{{ item['content'] }}"
+           data-reasons='{{ item['reasons'] }}'
+           data-checked="{{ item['checked_at'][:16].replace('T', ' ') }}"
+           style="cursor:pointer;">
+        <div class="risk-pill {% if item['risk_level'] == 'An toàn' %}safe{% elif item['risk_level'] == 'Nghi ngờ' %}warn{% else %}danger{% endif %}">
+          <span class="dot"></span>{{ item['risk_level'] }}
+        </div>
+        <div>
+          <div class="subj">{{ item['subject'] or '(Không có tiêu đề)' }}</div>
+          <div class="meta">{{ item['sender'] or 'Không rõ người gửi' }}</div>
+        </div>
+        <div class="score-mini">{{ item['score'] }}</div>
+        <div class="when">{{ item['checked_at'][:16].replace('T', ' ') }}</div>
+      </div>
+      {% endfor %}
+    </div>
+    {% else %}
+    <div class="empty-state">
+      <p style="margin:0;">Chưa có lịch sử kiểm tra nào. Quay lại trang <a href="{{ url_for('dashboard') }}">Quét email</a> để bắt đầu.</p>
+    </div>
+    {% endif %}
+  </main>
+</div>
+
+<div class="detail-modal-backdrop" id="detail-backdrop">
+  <div class="detail-modal">
+    <div class="close-row"><button id="detail-close" aria-label="Đóng">&times;</button></div>
+    <div class="risk-pill" id="detail-risk"><span class="dot"></span><span id="detail-risk-text">—</span></div>
+    <h3 style="margin-top:14px;" id="detail-subject">—</h3>
+    <p style="font-size:13px; margin-bottom:4px;" id="detail-sender"></p>
+    <p style="font-size:12.5px; color: var(--text-faint);" id="detail-when"></p>
+
+    <h4 style="font-size:14px; margin-top:18px;">Lý do cảnh báo</h4>
+    <ul class="reasons-list" id="detail-reasons"></ul>
+
+    <h4 style="font-size:14px; margin-top:18px;">Nội dung email</h4>
+    <div class="detail-body" id="detail-content"></div>
+
+    <button class="btn btn-danger-outline" id="detail-delete" style="margin-top:16px;">Xóa mục này</button>
+  </div>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/history.js') }}"></script>
+{% endblock %}
