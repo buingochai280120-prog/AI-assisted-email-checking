@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+{% block title %}Đăng ký — Email Guard AI{% endblock %}
+{% block body %}
+<div class="auth-shell">
+  <div class="auth-visual">
+    <div class="radar"></div>
+    <div class="radar-sweep"></div>
+    <div class="radar-dot" style="top: 45%; left: 55%;"></div>
+
+    <div class="auth-visual-copy">
+      <div class="kicker">EMAIL GUARD AI</div>
+      <h1>Tạo tài khoản để lưu lại toàn bộ lịch sử kiểm tra của bạn.</h1>
+      <p>Mỗi email bạn quét sẽ được chấm điểm rủi ro và lưu lại, giúp bạn theo dõi các nỗ lực lừa đảo nhắm vào hộp thư của mình theo thời gian.</p>
+    </div>
+
+    <div class="auth-visual-foot">
+      <div><strong>Miễn phí</strong>không giới hạn lượt quét</div>
+      <div><strong>Riêng tư</strong>chỉ bạn xem được lịch sử</div>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-card">
+      <div class="brand">
+        <span class="brand-mark">EG</span>
+        Email Guard AI
+      </div>
+
+      <h2>Tạo tài khoản</h2>
+      <p class="sub">Chỉ mất chưa đến một phút.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('register') }}" novalidate>
+        <div class="field">
+          <label for="full_name">Họ và tên</label>
+          <input type="text" id="full_name" name="full_name" placeholder="Nguyễn Văn A" value="{{ full_name or '' }}" required autofocus>
+        </div>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="ban@vidu.com" value="{{ email or '' }}" required>
+        </div>
+        <div class="field">
+          <label for="password">Mật khẩu</label>
+          <input type="password" id="password" name="password" placeholder="Tối thiểu 6 ký tự" required minlength="6">
+        </div>
+        <div class="field">
+          <label for="confirm_password">Xác nhận mật khẩu</label>
+          <input type="password" id="confirm_password" name="confirm_password" placeholder="Nhập lại mật khẩu" required minlength="6">
+        </div>
+        <button type="submit" class="btn btn-primary">Đăng ký</button>
+      </form>
+
+      <p class="auth-switch">Đã có tài khoản? <a href="{{ url_for('login') }}">Đăng nhập</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}

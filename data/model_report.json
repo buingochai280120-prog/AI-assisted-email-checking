@@ -1,0 +1,13 @@
+{
+    "model": "TF-IDF + Multinomial Naive Bayes",
+    "dataset": "data/training_data.csv",
+    "total_samples": 40,
+    "training_samples": 32,
+    "testing_samples": 8,
+    "metrics": {
+        "accuracy": 0.75,
+        "precision": 0.6666666666666666,
+        "recall": 1.0,
+        "f1_score": 0.8
+    }
+}
