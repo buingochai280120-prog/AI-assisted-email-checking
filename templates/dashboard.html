@@ -1,0 +1,135 @@
+{% extends "base.html" %}
+{% block title %}Bảng điều khiển — Email Guard AI{% endblock %}
+{% block body %}
+<div class="app-shell">
+  {% include "_sidebar.html" %}
+
+  <main class="main">
+    <div class="page-head">
+      <div class="eyebrow">QUÉT EMAIL</div>
+      <h1>Chào {{ current_user['full_name'] }}, dán nội dung email cần kiểm tra bên dưới.</h1>
+      <p>AI sẽ phân tích văn phong, liên kết và các dấu hiệu lừa đảo thường gặp, sau đó đưa ra điểm rủi ro cùng lý do cụ thể.</p>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-tile safe">
+        <div class="n">{{ stats.get('An toàn', 0) }}</div>
+        <div class="l">Email an toàn</div>
+      </div>
+      <div class="stat-tile warn">
+        <div class="n">{{ stats.get('Nghi ngờ', 0) }}</div>
+        <div class="l">Email nghi ngờ</div>
+      </div>
+      <div class="stat-tile danger">
+        <div class="n">{{ stats.get('Nguy hiểm', 0) }}</div>
+        <div class="l">Email nguy hiểm</div>
+      </div>
+    </div>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+      <div class="flash-stack">
+        {% for category, message in messages %}
+          <div class="flash {{ category }}">{{ message }}</div>
+        {% endfor %}
+      </div>
+      {% endif %}
+    {% endwith %}
+
+    <section class="scan-panel">
+      <h2>Kiểm tra email mới</h2>
+      <p class="hint">Bạn có thể dán trực tiếp nội dung email, kèm theo người gửi và tiêu đề nếu có để AI phân tích chính xác hơn.</p>
+
+      <form id="scan-form">
+        <div class="upload-row">
+          <label for="file-upload" class="upload-dropzone" id="upload-dropzone">
+            <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+              <path d="M12 16V4M12 4l-4 4M12 4l4 4"/>
+              <path d="M4 16v2a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-2"/>
+            </svg>
+            <span class="upload-text">Kéo thả file vào đây, hoặc <strong>chọn file</strong> (.txt, .eml)</span>
+            <span class="upload-filename" id="upload-filename"></span>
+          </label>
+          <input type="file" id="file-upload" accept=".txt,.eml" hidden>
+        </div>
+        <div class="divider-or"><span>hoặc dán trực tiếp bên dưới</span></div>
+
+        <div class="grid-2">
+          <div class="field">
+            <label for="sender">Người gửi (tùy chọn)</label>
+            <input type="text" id="sender" name="sender" placeholder="vidu: 'Ngân hàng ABC' <no-reply@abc-secure.xyz>">
+          </div>
+          <div class="field">
+            <label for="subject">Tiêu đề (tùy chọn)</label>
+            <input type="text" id="subject" name="subject" placeholder="vidu: Cảnh báo tài khoản của bạn">
+          </div>
+        </div>
+        <div class="field">
+          <label for="content">Nội dung email <span style="color: var(--danger)">*</span></label>
+          <textarea id="content" name="content" placeholder="Dán toàn bộ nội dung email vào đây..." required></textarea>
+        </div>
+
+        <input type="hidden" id="reply_to" name="reply_to">
+        <input type="hidden" id="auth_results" name="auth_results">
+        <input type="hidden" id="return_path" name="return_path">
+        <p class="auth-badge" id="auth-badge" style="display:none;"></p>
+
+        <div class="scan-actions">
+          <button type="submit" class="btn btn-primary" id="scan-btn">Phân tích ngay</button>
+          <span class="loading-line" id="loading-line" style="display:none;">
+            <span class="spin"></span> AI đang phân tích...
+          </span>
+        </div>
+      </form>
+
+      <div class="result-box" id="result-box">
+        <div class="result-head">
+          <div class="score-dial" id="score-dial">
+            <div class="num"><span id="score-num">0</span><small>/ 100</small></div>
+          </div>
+          <div>
+            <div class="risk-pill" id="risk-pill"><span class="dot"></span><span id="risk-text">—</span></div>
+            <p style="margin-top:8px; font-size:13px;" id="ml-proba-text"></p>
+            <p style="margin-top:4px; font-size:12px; opacity:.8;" id="component-score-text"></p>
+          </div>
+        </div>
+        <h3 style="font-size:15px;">Lý do AI đưa ra cảnh báo</h3>
+        <ul class="reasons-list" id="reasons-list"></ul>
+      </div>
+    </section>
+
+    <section>
+      <div style="display:flex; align-items:center; justify-content:space-between; margin-bottom:14px;">
+        <h2 style="font-size:17px;">Lịch sử gần đây</h2>
+        <a href="{{ url_for('history_page') }}" style="font-size:13.5px;">Xem tất cả</a>
+      </div>
+
+      {% if recent_history %}
+      <div class="history-list">
+        {% for item in recent_history %}
+        <div class="history-item">
+          <div class="risk-pill {% if item['risk_level'] == 'An toàn' %}safe{% elif item['risk_level'] == 'Nghi ngờ' %}warn{% else %}danger{% endif %}">
+            <span class="dot"></span>{{ item['risk_level'] }}
+          </div>
+          <div>
+            <div class="subj">{{ item['subject'] or '(Không có tiêu đề)' }}</div>
+            <div class="meta">{{ item['sender'] or 'Không rõ người gửi' }}</div>
+          </div>
+          <div class="score-mini">{{ item['score'] }}</div>
+          <div class="when">{{ item['checked_at'][:16].replace('T', ' ') }}</div>
+        </div>
+        {% endfor %}
+      </div>
+      {% else %}
+      <div class="empty-state">
+        <p style="margin:0;">Bạn chưa kiểm tra email nào. Hãy dán một email vào ô phía trên để bắt đầu.</p>
+      </div>
+      {% endif %}
+    </section>
+  </main>
+</div>
+{% endblock %}
+
+{% block scripts %}
+<script src="{{ url_for('static', filename='js/main.js') }}"></script>
+{% endblock %}

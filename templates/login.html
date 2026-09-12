@@ -1,0 +1,60 @@
+{% extends "base.html" %}
+{% block title %}Đăng nhập — Email Guard AI{% endblock %}
+{% block body %}
+<div class="auth-shell">
+  <div class="auth-visual">
+    <div class="radar"></div>
+    <div class="radar-sweep"></div>
+    <div class="radar-dot" style="top: 38%; left: 62%;"></div>
+    <div class="radar-dot" style="top: 60%; left: 40%; background: var(--warning); box-shadow: 0 0 0 6px var(--warning-dim);"></div>
+
+    <div class="auth-visual-copy">
+      <div class="kicker">EMAIL GUARD AI</div>
+      <h1>Phát hiện email lừa đảo trước khi bạn kịp bấm vào link.</h1>
+      <p>Hệ thống kết hợp mô hình học máy và bộ quy tắc chuyên gia để quét nội dung email, chấm điểm rủi ro và giải thích rõ lý do cảnh báo.</p>
+    </div>
+
+    <div class="auth-visual-foot">
+      <div><strong>2</strong>lớp phân tích AI</div>
+      <div><strong>0-100</strong>thang điểm rủi ro</div>
+      <div><strong>24/7</strong>lưu lịch sử kiểm tra</div>
+    </div>
+  </div>
+
+  <div class="auth-form-side">
+    <div class="auth-card">
+      <div class="brand">
+        <span class="brand-mark">EG</span>
+        Email Guard AI
+      </div>
+
+      <h2>Đăng nhập</h2>
+      <p class="sub">Nhập thông tin tài khoản để tiếp tục kiểm tra email.</p>
+
+      {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+        <div class="flash-stack">
+          {% for category, message in messages %}
+            <div class="flash {{ category }}">{{ message }}</div>
+          {% endfor %}
+        </div>
+        {% endif %}
+      {% endwith %}
+
+      <form method="POST" action="{{ url_for('login') }}" novalidate>
+        <div class="field">
+          <label for="email">Email</label>
+          <input type="email" id="email" name="email" placeholder="ban@vidu.com" value="{{ email or '' }}" required autofocus>
+        </div>
+        <div class="field">
+          <label for="password">Mật khẩu</label>
+          <input type="password" id="password" name="password" placeholder="••••••••" required>
+        </div>
+        <button type="submit" class="btn btn-primary">Đăng nhập</button>
+      </form>
+
+      <p class="auth-switch">Chưa có tài khoản? <a href="{{ url_for('register') }}">Đăng ký ngay</a></p>
+    </div>
+  </div>
+</div>
+{% endblock %}
