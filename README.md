@@ -133,6 +133,3 @@ Authentication PASS giảm nhẹ final score; FAIL tăng nhẹ final score. Bộ
 
 Lưu ý: `sender_score`/`social_score`/`content_score` có phần trùng lặp khái niệm với `legacy_rule` (cùng kiểm tra auth, reply-to, từ khóa khẩn cấp...). Đây là chủ ý — một dấu hiệu được nhiều module độc lập cùng xác nhận sẽ đẩy rủi ro lên rõ rệt hơn so với dấu hiệu chỉ một module phát hiện, thay vì các module này chỉ đóng góp lý do (reasons) như bản trước.
 
-## Lưu ý học thuật
-
-Không dùng `meta_model.pkl` cũ của bài 2 vì model đó được huấn luyện từ vài điểm score giả lập. Bản ghép ưu tiên công thức hybrid có thể giải thích rõ khi bảo vệ. Nếu muốn dùng stacking/meta-model thật, cần tạo meta-dataset bằng out-of-fold predictions trên dữ liệu thực tế.
