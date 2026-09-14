@@ -1,9 +1,3 @@
-/* =========================================================================
-   EMAIL GUARD AI — stylesheet
-   Chủ đề thị giác: "radar quét mối đe dọa" — nền xanh than sâu, các đường
-   viền mảnh (hairline) thay cho đổ bóng, một vệt quét (scan-line) làm điểm
-   nhấn chuyển động duy nhất của giao diện.
-   ========================================================================= */
 
 :root {
   /* Màu nền tối, tương phản vừa phải */

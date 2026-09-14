@@ -75,6 +75,13 @@
 
     try {
       const res = await fetch(`/api/history/${activeId}`, { method: "DELETE" });
+
+      if (res.status === 401) {
+        alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
+        window.location.href = "/login";
+        return;
+      }
+
       if (!res.ok) throw new Error("Xóa thất bại.");
 
       const row = list.querySelector(`.history-item[data-id="${activeId}"]`);

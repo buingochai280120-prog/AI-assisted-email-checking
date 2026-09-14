@@ -23,6 +23,8 @@
   const contentInput = document.getElementById("content");
   const replyToInput = document.getElementById("reply_to");
   const authResultsInput = document.getElementById("auth_results");
+  const returnPathInput = document.getElementById("return_path");
+  const componentScoreText = document.getElementById("component-score-text");
   const authBadge = document.getElementById("auth-badge");
 
   function showAuthBadge(authResultsRaw) {
@@ -80,6 +82,7 @@
       contentInput.value = data.content;
       replyToInput.value = data.reply_to || "";
       authResultsInput.value = data.auth_results || "";
+      returnPathInput.value = data.return_path || "";
       showAuthBadge(data.auth_results || "");
 
       uploadFilenameEl.textContent = "Đã nạp: " + file.name;
@@ -136,7 +139,10 @@
     riskText.textContent = result.risk_level;
 
     mlProbaText.textContent =
-      `Xác suất theo mô hình học máy (Naive Bayes): ${(result.ml_probability * 100).toFixed(1)}%`;
+      `Xác suất Text AI (Naive Bayes): ${(result.ml_probability * 100).toFixed(1)}%`;
+    if (componentScoreText) {
+      componentScoreText.textContent = `Rule: ${result.rule_score}/100 · URL: ${result.url_score}/100 · Sender: ${result.sender_score}/100 · Social: ${result.social_score}/100`;
+    }
 
     reasonsList.innerHTML = "";
     result.reasons.forEach((reason) => {
@@ -197,6 +203,7 @@
       content: document.getElementById("content").value.trim(),
       reply_to: replyToInput.value.trim(),
       auth_results: authResultsInput.value.trim(),
+      return_path: returnPathInput.value.trim(),
     };
 
     if (!payload.content) {
@@ -211,6 +218,12 @@
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify(payload),
       });
+
+      if (res.status === 401) {
+        alert("Phiên đăng nhập đã hết hạn, vui lòng đăng nhập lại.");
+        window.location.href = "/login";
+        return;
+      }
 
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
