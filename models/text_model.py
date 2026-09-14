@@ -1,15 +1,4 @@
-"""Text phishing model: TF-IDF + Logistic Regression, với lazy loading/training.
 
-Lịch sử thay đổi quan trọng (xem README để biết chi tiết đầy đủ):
-- Đổi từ MultinomialNB sang LogisticRegression: trên cùng dữ liệu, Logistic
-  Regression cho kết quả tổng quát hoá tốt hơn rõ rệt trên tập đánh giá
-  "ngoài phân phối" (OOD) — xem `evaluate()`/`data/ood_eval.csv`.
-- Tách riêng `evaluate()` (chỉ để BÁO CÁO số liệu, không đụng tới model đang
-  chạy) và `train_and_save()` (huấn luyện + LƯU model dùng thực tế). Trước
-  đây `get_metrics()` gọi `train_and_save()` mỗi lần muốn xem số liệu, vô
-  tình ghi đè `models/text_model.pkl` bằng một model mới mỗi lần kiểm tra —
-  không sai về mặt toán học nhưng dễ gây nhầm lẫn khi debug/bảo trì.
-"""
 from __future__ import annotations
 import os
 import re
@@ -35,14 +24,7 @@ _metrics = None
 
 
 def _build_pipeline() -> Pipeline:
-    """Tạo một pipeline TF-IDF + LogisticRegression mới (chưa fit).
-
-    So với MultinomialNB trước đây: trên dataset đa dạng hoá hiện tại (xem
-    training/generate_dataset.py), LogisticRegression(class_weight="balanced")
-    đạt OOD accuracy ~93% so với ~86% của NB, và OOD precision 100% — ít báo
-    động giả hơn trên email hợp lệ. Đã dò C trong {0.3, 0.5, 1, 2, 4}, C=1.0
-    (giá trị mặc định) là tốt nhất trên tập OOD.
-    """
+    
     return Pipeline([
         ("tfidf", TfidfVectorizer(lowercase=True, ngram_range=(1, 2), min_df=1, max_df=0.98, sublinear_tf=True)),
         ("classifier", LogisticRegression(max_iter=2000, C=1.0, class_weight="balanced")),

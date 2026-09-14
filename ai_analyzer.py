@@ -1,12 +1,4 @@
-"""Email Guard AI - orchestrator kết hợp hai project.
 
-Kiến trúc:
-- Text ML: TF-IDF + MultinomialNB (dataset lớn của bài 1, có deduplicate).
-- URL ML: RandomForest + URL structural features (module của bài 2, có fallback rule).
-- Detection modules: content, sender, social engineering.
-- Legacy rule engine: giữ bộ luật phong phú của bài 1 (brand/domain, SPF/DKIM/DMARC...).
-- Final score: hybrid rõ ràng, không dùng meta model giả lập.
-"""
 from models.text_model import phishing_probability, get_metrics
 from detection.url_analyzer import analyze_urls
 from detection.email_analyzer import analyze_email_content
